@@ -1,0 +1,12 @@
+<clients>
+  <client id="1" key ="xxxx" mail="asa@asda.com">
+    <alert type="memory" limit="50%"/>
+    <alert type="cpu" limit="50%"/>
+    <alert type="processes" limit="50"/>
+  </client>
+  <client id="2" key ="yyyy" mail="asa@asda.com">
+    <alert type="memory" limit="50%"/>
+    <alert type="cpu" limit="20%"/>
+    <alert type="processes" limit="50"/>
+  </client>
+</clients>

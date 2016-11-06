@@ -18,6 +18,28 @@ CMachineDataInterface::CMachineDataInterface()
 	m_cpu = 0;
 }
 
+CMachineDataInterface::CMachineDataInterface(int id, string key)
+{
+	m_id = id;
+	m_key = key;
+}
+
+CMachineDataInterface::CMachineDataInterface(int id, string key, double memory, double cpu, double process)
+	: CMachineDataInterface(id,key)
+{
+	m_memory = memory;
+	m_cpu = cpu;
+	m_process = process;
+
+	updateTimestamp();
+}
+
+CMachineDataInterface::CMachineDataInterface(int id, string key, double memory, double cpu, double process, string timestamp)
+	: CMachineDataInterface(id, key, memory, cpu, process)
+{
+	m_timestamp = timestamp;
+}
+
 void CMachineDataInterface::update()
 {
 	updateTimestamp();
@@ -52,6 +74,26 @@ double  CMachineDataInterface::getCpuUsage()
 string CMachineDataInterface::getTimestamp()
 {
 	return m_timestamp;
+}
+
+string CMachineDataInterface::getKey()
+{
+	return m_key;
+}
+
+int CMachineDataInterface::getId()
+{
+	return m_id;
+}
+
+void CMachineDataInterface::setKey(string new_key)
+{
+	m_key = new_key;
+}
+
+void CMachineDataInterface::setId(int id)
+{
+	m_id = id;
 }
 
 const string CMachineDataInterface::getJSON()

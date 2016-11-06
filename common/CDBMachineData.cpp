@@ -21,7 +21,7 @@ DBConnectionStatus CDBMachineData::close()
 	return DBConnectionStatus::DISCONNECTED;
 }
 
-DBDataStatus CDBMachineData::write(CMachineData)
+DBDataStatus CDBMachineData::write(const CMachineData* data)
 {
 	return DBDataStatus::WRITE_NOK;
 }

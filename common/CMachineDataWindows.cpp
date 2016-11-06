@@ -61,4 +61,5 @@ void CMachineDataWindows::updateCpuUsageInfo()
 {
 	FILETIME idleTime, kernelTime, userTime;
 	m_cpu = GetSystemTimes(&idleTime, &kernelTime, &userTime) ? CalculateCPULoad(FileTimeToInt64(idleTime), FileTimeToInt64(kernelTime) + FileTimeToInt64(userTime)) : -1.0f;
+	m_cpu *= 100;
 }

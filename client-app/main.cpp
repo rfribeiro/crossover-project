@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/log/trivial.hpp>
 using namespace std;
 
 #include "CClientAppLogic.h"

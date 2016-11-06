@@ -31,7 +31,7 @@ void session::handle_read(const boost::system::error_code& error,
 		cout << "Received: " << endl << data_ << endl << endl;
 
 		CServerAppLogic* logic = Singleton<CServerAppLogic>::Instance();
-		//logic->receivedPackage(data_, bytes_transferred);
+		logic->receivedPackage(data_);
 		string data_resp = logic->getResponseData();
 
 		if (data_resp.length() < sizeof(data_))

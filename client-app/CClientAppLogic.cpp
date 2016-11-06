@@ -17,8 +17,10 @@ const string string_timestamp = "timestamp";
 
 CClientAppLogic::CClientAppLogic()
 {
-	machine_data = Singleton<CMachineData>::Instance();
 	m_server_config = CServerConfiguration();
+	machine_data = Singleton<CMachineData>::Instance();
+	machine_data->setId(m_server_config.getClientId());
+	machine_data->setKey(m_server_config.getKey());
 }
 
 CClientAppLogic::~CClientAppLogic()
@@ -28,8 +30,8 @@ CClientAppLogic::~CClientAppLogic()
 const string CClientAppLogic::getData()
 {
 	ptree pt;
-	pt.put(string_client_id, m_server_config.getClientId());
-	pt.put(string_key, m_server_config.getKey());
+	pt.put(string_client_id, machine_data->getId());
+	pt.put(string_key, machine_data->getKey());
 	pt.put(string_timestamp, machine_data->getTimestamp());
 	pt.put(string_memory, machine_data->getMemory());
 	pt.put(string_cpu, machine_data->getCpuUsage());

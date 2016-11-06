@@ -12,11 +12,18 @@ class CMachineDataInterface
 {
 public:
 	CMachineDataInterface();
+	CMachineDataInterface(int id, string key);
+	CMachineDataInterface(int id, string key, double memory, double cpu, double process);
+	CMachineDataInterface(int id, string key, double memory, double cpu, double process, string timestamp);
 	void update();
 	double getMemory();
 	double getProcess();
 	double getCpuUsage();
 	string getTimestamp();
+	string getKey();
+	int getId();
+	void setKey(string new_key);
+	void setId(int id);
 	const string getJSON();
 	void writeJSON(string data);
 	virtual ~CMachineDataInterface() = 0 {};
@@ -30,5 +37,7 @@ protected:
 	double m_process = 0;
 	double m_cpu = 0;
 	string m_timestamp;
+	int m_id;
+	string m_key;
 };
 

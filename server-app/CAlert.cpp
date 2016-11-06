@@ -6,7 +6,7 @@ CAlert::CAlert()
 	m_value = 0;
 }
 
-CAlert::CAlert(AlertType type, double value)
+CAlert::CAlert(CAlertType type, double value)
 {
 	m_type = type;
 	m_value = value;
@@ -16,7 +16,7 @@ CAlert::~CAlert()
 {
 }
 
-AlertType CAlert::getType()
+CAlertType CAlert::getType()
 {
 	return m_type;
 }

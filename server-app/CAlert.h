@@ -3,7 +3,7 @@
 
 using namespace std;
 
-enum AlertType
+enum CAlertType
 {
 	ALERT_UNDEFINED = -1,
 	ALERT_MEMORY = 0,
@@ -15,13 +15,13 @@ class CAlert
 {
 public:
 	CAlert();
-	CAlert(AlertType type, double value);
+	CAlert(CAlertType type, double value);
 	~CAlert();
 
-	AlertType getType();
+	CAlertType getType();
 	double getValue();
 private:
-	AlertType m_type;
+	CAlertType m_type;
 	double m_value;
 };
 

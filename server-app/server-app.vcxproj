@@ -164,7 +164,7 @@
     <ClCompile Include="..\common\CMachineDataLinux.cpp" />
     <ClCompile Include="..\common\CMachineDataWindows.cpp" />
     <ClCompile Include="CAlert.cpp" />
-    <ClCompile Include="CClientConfiguration.cpp" />
+    <ClCompile Include="CClientData.cpp" />
     <ClCompile Include="CEmail.cpp" />
     <ClCompile Include="CMachineDataConfiguration.cpp" />
     <ClCompile Include="CServerAppLogic.cpp" />
@@ -179,14 +179,15 @@
     <ClInclude Include="..\common\CMachineDataWindows.h" />
     <ClInclude Include="..\common\Singleton.h" />
     <ClInclude Include="CAlert.h" />
-    <ClInclude Include="CClientConfiguration.h" />
+    <ClInclude Include="CClientData.h" />
+    <ClInclude Include="CConcurrentQueue.h" />
     <ClInclude Include="CEmail.h" />
     <ClInclude Include="CMachineDataConfiguration.h" />
     <ClInclude Include="CServerAppLogic.h" />
     <ClInclude Include="CServerConnection.h" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="001.xml" />
+    <Xml Include="clients-data.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

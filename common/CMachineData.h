@@ -10,9 +10,9 @@ class CComputerData : public CComputerDataLinux
 {
 public:
 	CMachineData();
+	CMachineData(int id, string key);
+	CMachineData(int id, string key, double memory, double cpu, double process);
+	CMachineData(int id, string key, double memory, double cpu, double process, string timestamp);
 protected:
-	int m_memory = 0;
-	int m_process = 0;
-	int m_cpu = 0;
 };
 
