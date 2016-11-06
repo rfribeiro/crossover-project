@@ -12,8 +12,8 @@ public:
 	~CServerAppLogic();
 	void run();
 	void receivedPackage(session* s, string data, size_t bytes_transferred);
-private:
 	string getResponseData();
+private:
 	void loadClientConfigurations();
 	void writeDatabase(string data);
 	void sendPackage();

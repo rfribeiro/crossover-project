@@ -5,7 +5,7 @@ using namespace std;
 #include <boost/asio.hpp>
 
 boost::asio::io_service io_service;
-boost::posix_time::seconds interval(1); // 1 second
+boost::posix_time::seconds interval(5); // 1 second
 boost::asio::deadline_timer timer(io_service, interval);
 
 void tick(const boost::system::error_code&) 

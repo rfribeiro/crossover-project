@@ -1,6 +1,9 @@
 #pragma once
 #include <cstdlib>
 #include <iostream>
+#include <istream>
+#include <ostream>
+#include <string>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
@@ -17,7 +20,7 @@ public:
 
 	void start();
 
-	void send_data(string data_to_transfer, size_t bytes_to_transfer);
+	void send_data(string data_to_transfer);
 private:
 	void handle_read(const boost::system::error_code& error,
 		size_t bytes_transferred);
@@ -27,6 +30,8 @@ private:
 	tcp::socket socket_;
 	enum { max_length = 1024 };
 	char data_[max_length];
+	boost::asio::streambuf request_;
+	boost::asio::streambuf response_;
 };
 
 class CServerConnection

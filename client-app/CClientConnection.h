@@ -38,7 +38,6 @@ public:
 
 		// Start an asynchronous resolve to translate the server and service names
 		// into a list of endpoints.
-		//tcp::resolver::query query(server, "http");
 		tcp::resolver::query query(server, port);
 		resolver_.async_resolve(query,
 			boost::bind(&CClientConnection::handle_resolve, this,
@@ -47,6 +46,12 @@ public:
 	}
 
 private:
+	std::string make_string(boost::asio::streambuf& streambuf)
+	{
+		return{ buffers_begin(streambuf.data()),
+			buffers_end(streambuf.data()) };
+	}
+
 	void handle_resolve(const boost::system::error_code& err,
 		tcp::resolver::iterator endpoint_iterator)
 	{
@@ -68,6 +73,8 @@ private:
 	{
 		if (!err)
 		{
+			cout << "Sent : " << endl << make_string(request_) << endl << endl;
+
 			// The connection was successful. Send the request.
 			boost::asio::async_write(socket_, request_,
 				boost::bind(&CClientConnection::handle_write_request, this,
@@ -100,9 +107,12 @@ private:
 	{
 		if (!err)
 		{
+			cout << "Received : " << endl << make_string(response_) << endl << endl;
+
 			// Check that response is OK.
 			std::istream response_stream(&response_);
 			std::string http_version;
+
 			response_stream >> http_version;
 			unsigned int status_code;
 			response_stream >> status_code;
@@ -124,6 +134,7 @@ private:
 			boost::asio::async_read_until(socket_, response_, "\r\n\r\n",
 				boost::bind(&CClientConnection::handle_read_headers, this,
 					boost::asio::placeholders::error));
+
 		}
 		else
 		{
@@ -135,11 +146,18 @@ private:
 	{
 		if (!err)
 		{
+			int content_length = 0;
 			// Process the response headers.
 			std::istream response_stream(&response_);
 			std::string header;
 			while (std::getline(response_stream, header) && header != "\r")
+			{
+				if (strncmp(header.c_str(), "Content-Length:", strlen("Content-Length:")) == 0)
+				{
+					content_length = atoi(header.substr(15, header.length() - 1).c_str());
+				}
 				std::cout << header << "\n";
+			}
 			std::cout << "\n";
 
 			// Write whatever content we already have to output.
@@ -148,7 +166,7 @@ private:
 
 			// Start reading remaining data until EOF.
 			boost::asio::async_read(socket_, response_,
-				boost::asio::transfer_at_least(1),
+				boost::asio::transfer_at_least(0),
 				boost::bind(&CClientConnection::handle_read_content, this,
 					boost::asio::placeholders::error));
 		}
@@ -165,11 +183,6 @@ private:
 			// Write all of the data that has been read so far.
 			std::cout << &response_;
 
-			// Continue reading remaining data until EOF.
-			boost::asio::async_read(socket_, response_,
-				boost::asio::transfer_at_least(1),
-				boost::bind(&CClientConnection::handle_read_content, this,
-					boost::asio::placeholders::error));
 		}
 		else if (err != boost::asio::error::eof)
 		{

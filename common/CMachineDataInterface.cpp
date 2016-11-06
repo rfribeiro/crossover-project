@@ -20,11 +20,18 @@ CMachineDataInterface::CMachineDataInterface()
 
 void CMachineDataInterface::update()
 {
-	namespace pt = boost::posix_time;
-	m_timestamp = pt::to_iso_string(pt::second_clock::local_time());
+	updateTimestamp();
+
 	updateMemoryInfo();
 	updateCpuUsageInfo();
 	updateProcessInfo();
+}
+
+void CMachineDataInterface::updateTimestamp()
+{
+	boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
+	boost::posix_time::time_duration duration(time.time_of_day());
+	m_timestamp = to_iso_string(duration);
 }
 
 double  CMachineDataInterface::getMemory()
@@ -40,6 +47,11 @@ double  CMachineDataInterface::getProcess()
 double  CMachineDataInterface::getCpuUsage()
 {
 	return m_cpu;
+}
+
+string CMachineDataInterface::getTimestamp()
+{
+	return m_timestamp;
 }
 
 const string CMachineDataInterface::getJSON()

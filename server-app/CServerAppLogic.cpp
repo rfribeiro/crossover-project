@@ -43,15 +43,15 @@ void CServerAppLogic::writeDatabase(string data)
 
 void CServerAppLogic::receivedPackage(session* s, string data, size_t bytes_transferred)
 {
+	// log
+
 	// Unpack package
 
 	// check key
 
-	// send anwser
-	string resp = getResponseData();
-	s->send_data(resp, resp.length());
-
 	// write db
+
+	// check alerts
 }
 
 void CServerAppLogic::sendPackage()
@@ -66,10 +66,10 @@ string CServerAppLogic::getResponseData()
 {
 	std::stringstream ssOut;
 	std::string json = "{ \"success\" : \"true\" }";
-	ssOut << "HTTP/1.1 200 OK" << std::endl;
-	ssOut << "Content-Type: text/html" << std::endl;
-	ssOut << "Content-Length: " << json.length() << std::endl;
-	ssOut << std::endl;
+	ssOut << "HTTP/1.1 200 OK" << "\r\n";
+	ssOut << "Content-Type: text/html" << "\r\n";
+	ssOut << "Content-Length: " << json.length();
+	ssOut << "\r\n\r\n";
 	ssOut << json;
 
 	return ssOut.str();

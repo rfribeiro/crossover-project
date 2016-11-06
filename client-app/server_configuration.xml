@@ -2,5 +2,6 @@
 <server>
   <ip>"127.0.0.1"</ip>
   <port>9999</port>
+  <interval>1</interval>
   <key>xxxx</key>
 </server>

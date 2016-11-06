@@ -16,10 +16,12 @@ public:
 	double getMemory();
 	double getProcess();
 	double getCpuUsage();
+	string getTimestamp();
 	const string getJSON();
 	void writeJSON(string data);
 	virtual ~CMachineDataInterface() = 0 {};
 protected:
+	void updateTimestamp();
 	virtual void updateProcessInfo() = 0;
 	virtual void updateMemoryInfo() = 0;
 	virtual void updateCpuUsageInfo() = 0;

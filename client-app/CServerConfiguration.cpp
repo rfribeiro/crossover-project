@@ -32,6 +32,11 @@ string CServerConfiguration::getKey()
 	return m_key;
 }
 
+int CServerConfiguration::getClientId()
+{
+	return m_client_id;
+}
+
 void CServerConfiguration::read()
 {
 	try {
