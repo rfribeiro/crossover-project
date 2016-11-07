@@ -89,13 +89,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>c:\boost\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\boost\;../common/</AdditionalIncludeDirectories>
       <BufferSecurityCheck>true</BufferSecurityCheck>
+      <UndefinePreprocessorDefinitions>_WIN32_WINNT=0x0501</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\boost\stage\$(Platform)\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\sqlite-dll-$(Platform);c:\boost\stage\$(Platform)\lib\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -106,13 +107,15 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>c:\boost\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\boost\;../common/</AdditionalIncludeDirectories>
       <BufferSecurityCheck>true</BufferSecurityCheck>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\boost\stage\$(Platform)\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\sqlite-dll-$(Platform);c:\boost\stage\$(Platform)\lib\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,15 +128,16 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>c:\boost\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\boost\;../common/</AdditionalIncludeDirectories>
       <BufferSecurityCheck>true</BufferSecurityCheck>
+      <UndefinePreprocessorDefinitions>_WIN32_WINNT=0x0501</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\boost\stage\$(Platform)\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\sqlite-dll-$(Platform);c:\boost\stage\$(Platform)\lib\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,15 +150,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>c:\boost\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\boost\;../common/</AdditionalIncludeDirectories>
       <BufferSecurityCheck>true</BufferSecurityCheck>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\boost\stage\$(Platform)\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\libs\sqlite-dll-$(Platform);c:\boost\stage\$(Platform)\lib\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -163,11 +169,16 @@
     <ClCompile Include="..\common\CMachineDataInterface.cpp" />
     <ClCompile Include="..\common\CMachineDataLinux.cpp" />
     <ClCompile Include="..\common\CMachineDataWindows.cpp" />
+    <ClCompile Include="..\common\sqlite.cpp" />
+    <ClCompile Include="..\common\sqlite3.c" />
+    <ClCompile Include="..\common\sqlite3pp.cpp" />
+    <ClCompile Include="..\common\sqlite3ppext.cpp" />
     <ClCompile Include="CAlert.cpp" />
     <ClCompile Include="CClientData.cpp" />
     <ClCompile Include="CEmail.cpp" />
     <ClCompile Include="CMachineDataConfiguration.cpp" />
     <ClCompile Include="CServerAppLogic.cpp" />
+    <ClCompile Include="CServerConfiguration.cpp" />
     <ClCompile Include="CServerConnection.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -178,16 +189,26 @@
     <ClInclude Include="..\common\CMachineDataLinux.h" />
     <ClInclude Include="..\common\CMachineDataWindows.h" />
     <ClInclude Include="..\common\Singleton.h" />
+    <ClInclude Include="..\common\sqlite.hpp" />
+    <ClInclude Include="..\common\sqlite3.h" />
+    <ClInclude Include="..\common\sqlite3ext.h" />
+    <ClInclude Include="..\common\sqlite3pp.h" />
+    <ClInclude Include="..\common\sqlite3ppext.h" />
     <ClInclude Include="CAlert.h" />
     <ClInclude Include="CClientData.h" />
     <ClInclude Include="CConcurrentQueue.h" />
     <ClInclude Include="CEmail.h" />
     <ClInclude Include="CMachineDataConfiguration.h" />
     <ClInclude Include="CServerAppLogic.h" />
+    <ClInclude Include="CServerConfiguration.h" />
     <ClInclude Include="CServerConnection.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="create_table.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <Xml Include="clients-data.xml" />
+    <Xml Include="server-configuration.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

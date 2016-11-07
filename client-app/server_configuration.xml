@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<server>
-  <ip>"127.0.0.1"</ip>
-  <port>9999</port>
-  <interval>1</interval>
-  <key>xxxx</key>
-</server>

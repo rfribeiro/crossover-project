@@ -1,3 +1,4 @@
 Debug/
 server-app/Debug/
 client-app/Debug/
+server-app/test.db

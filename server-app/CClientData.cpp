@@ -35,6 +35,21 @@ CAlert CClientData::getAlert(CAlertType type)
 	return m_alerts[type];
 }
 
+void CClientData::setId(int id)
+{
+	m_id = id;
+}
+
+void CClientData::setKey(string key)
+{
+	m_key = key;
+}
+
+void CClientData::setEmail(string mail)
+{
+	m_email = mail;
+}
+
 int CClientData::getId()
 {
 	return m_id;
@@ -52,7 +67,7 @@ string CClientData::getEmail()
 
 bool CClientData::checkAlert(CAlertType type, double value)
 {
-	if (m_alerts[type].getValue() < value)
+	if (m_alerts[type].getValue() > 0 && m_alerts[type].getValue() < value)
 	{
 		return true;
 	}

@@ -1,4 +1,5 @@
 #include "CAlert.h"
+#include <boost/lexical_cast.hpp>
 
 CAlert::CAlert()
 {
@@ -10,6 +11,56 @@ CAlert::CAlert(CAlertType type, double value)
 {
 	m_type = type;
 	m_value = value;
+}
+
+CAlert::CAlert(CAlertType type, string value)
+{
+	try
+	{
+		m_type = type;
+		if (value[value.length() - 1] == '%%')
+		{
+			value = value.substr(0, value.length() - 2);
+		}
+		m_value = boost::lexical_cast<double>(value);
+	}
+	catch (boost::bad_lexical_cast const&)
+	{
+		m_value = 0;
+	}
+	catch (std::exception& e)
+	{
+		//BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
+		std::cerr << "Exception: " << e.what() << "\n";
+	}
+}
+
+CAlert::CAlert(string type, string value)
+{
+	try
+	{
+		if (type == "memory")
+			m_type = CAlertType::ALERT_MEMORY;
+		else if (type == "cpu")
+			m_type = CAlertType::ALERT_CPU;
+		else if (type == "processes")
+			m_type = CAlertType::ALERT_PROCESSES;
+
+		if (value[value.length() - 1] == '%')
+		{
+			value = value.substr(0, value.length() - 1);
+		}
+		m_value = boost::lexical_cast<double>(value);
+	}
+	catch (boost::bad_lexical_cast const&)
+	{
+		m_value = 0;
+	}
+	catch (std::exception& e)
+	{
+		//BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
+		std::cerr << "Exception: " << e.what() << "\n";
+	}
 }
 
 CAlert::~CAlert()

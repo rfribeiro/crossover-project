@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS machine_data(id INTEGER, timestamp TEXT, memory REAL, cpu REAL, processes REAL);

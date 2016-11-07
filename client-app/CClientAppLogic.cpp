@@ -17,7 +17,7 @@ const string string_timestamp = "timestamp";
 
 CClientAppLogic::CClientAppLogic()
 {
-	m_server_config = CServerConfiguration();
+	m_server_config = CClientConfiguration();
 	machine_data = Singleton<CMachineData>::Instance();
 	machine_data->setId(m_server_config.getClientId());
 	machine_data->setKey(m_server_config.getKey());
@@ -33,8 +33,8 @@ const string CClientAppLogic::getData()
 	pt.put(string_client_id, machine_data->getId());
 	pt.put(string_key, machine_data->getKey());
 	pt.put(string_timestamp, machine_data->getTimestamp());
-	pt.put(string_memory, machine_data->getMemory());
-	pt.put(string_cpu, machine_data->getCpuUsage());
+	pt.put(string_memory, std::round(machine_data->getMemory()));
+	pt.put(string_cpu, std::round(machine_data->getCpuUsage()));
 	pt.put(string_processes, machine_data->getProcess());
 
 	ostringstream buf;

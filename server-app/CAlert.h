@@ -16,6 +16,8 @@ class CAlert
 public:
 	CAlert();
 	CAlert(CAlertType type, double value);
+	CAlert(CAlertType type, string value);
+	CAlert(string type, string value);
 	~CAlert();
 
 	CAlertType getType();

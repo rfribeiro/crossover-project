@@ -21,9 +21,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CServerConfiguration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\CMachineData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,12 +36,12 @@
     <ClCompile Include="CClientConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CClientConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CClientAppLogic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CServerConfiguration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\CMachineData.h">
@@ -65,8 +62,11 @@
     <ClInclude Include="CClientConnection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CClientConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="server_configuration.xml" />
+    <Xml Include="client-configuration.xml" />
   </ItemGroup>
 </Project>

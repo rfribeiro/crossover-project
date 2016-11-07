@@ -13,6 +13,10 @@ public:
 	void removeAlert(CAlertType type);
 	CAlert getAlert(CAlertType type);
 
+	void setId(int id);
+	void setKey(string key);
+	void setEmail(string mail);
+
 	int getId();
 	string getKey();
 	string getEmail();

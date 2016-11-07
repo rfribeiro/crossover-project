@@ -24,9 +24,8 @@ public:
 	
 	DBConnectionStatus open();
 	DBConnectionStatus close();
-	DBDataStatus write(const CMachineData* data);
+	DBDataStatus write(CMachineData* data);
 
 private:
-
 };
 

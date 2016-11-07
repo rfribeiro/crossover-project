@@ -1,7 +1,7 @@
 #include <iostream>
 #include "../common/Singleton.h"
 #include "../common/CMachineData.h"
-#include "CServerConfiguration.h"
+#include "CClientConfiguration.h"
 
 using namespace std;
 
@@ -14,5 +14,5 @@ public:
 private:
 	const string getData();
 	CMachineData* machine_data;
-	CServerConfiguration m_server_config;
+	CClientConfiguration m_server_config;
 };

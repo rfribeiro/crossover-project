@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <boost/log/trivial.hpp>
 #include "../common/Singleton.h"
 #include "CServerConnection.h"
 #include "../common/CMachineData.h"
@@ -24,9 +23,7 @@ public:
 
 private:
 	void loadClientConfigurations();
-	void writeDatabase(string data);
 	CMachineData* mapHttpToObject(string data);
-	void sendPackage();
 	void readAndSaveData();
 	void writeDatabase(CMachineData* data);
 	void checkAlerts(CMachineData* data);
@@ -34,5 +31,6 @@ private:
 	bool sendEmail(CClientData client, string data);
 	CConcurrentQueue<string> m_queue;
 	CClientData m_clients[MAX_CLIENTS];
+
 };
 

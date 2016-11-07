@@ -1,5 +1,7 @@
 #include "CServerAppLogic.h"
 #include "CServerConnection.h"
+#include "CServerConfiguration.h"
+
 #include "CEmail.h"
 #include "../common/CDBMachineData.h"
 #include <iostream>
@@ -9,15 +11,18 @@
 #include <map>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/scoped_thread.hpp>
+
 
 using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 using boost::property_tree::write_json;
+namespace pt = boost::property_tree;
 
-#define port 9999
-#define JSON_INDEX 160
+#define JSON_INDEX 159
+#define CLIENTS_CONF_FILENAME "clients-data.xml"
 
 const string string_client_id = "id";
 const string string_key = "key";
@@ -40,7 +45,7 @@ void CServerAppLogic::processData()
 {
 	while (true)
 	{
-		BOOST_LOG_TRIVIAL(trace) << "processData thread started!";
+		//BOOST_LOG_TRIVIAL(trace) << "processData thread started!";
 
 		Singleton<CServerAppLogic>::Instance()->readAndSaveData();
 
@@ -52,11 +57,11 @@ void CServerAppLogic::processRequests()
 {
 	while (true)
 	{
-		BOOST_LOG_TRIVIAL(trace) << "processRequests thread started!";
+		//BOOST_LOG_TRIVIAL(trace) << "processRequests thread started!";
 
 		//start server receive data
 		boost::asio::io_service io_service;
-		CServerConnection s(io_service, port);
+		CServerConnection s(io_service, Singleton<CServerConfiguration>::Instance()->getServerPort());
 		io_service.run();
 
 		boost::this_thread::sleep(boost::posix_time::seconds(60));
@@ -84,12 +89,60 @@ void CServerAppLogic::run()
 
 void CServerAppLogic::loadClientConfigurations()
 {
-	BOOST_LOG_TRIVIAL(trace) << "loadClientConfigurations";
-}
+	try
+	{
+		//BOOST_LOG_TRIVIAL(trace) << "loadClientConfigurations";
+		std::string filename(CLIENTS_CONF_FILENAME);
 
-void CServerAppLogic::writeDatabase(string data)
-{
+		// Create empty property tree object
+		pt::ptree tree;
 
+		// Parse the XML into the property tree.
+		pt::read_xml(filename, tree, boost::property_tree::xml_parser::trim_whitespace);
+
+		if (!tree.empty())
+		{
+			// Use `get_child` to find the node containing the books and
+			// iterate over its children.
+			// `BOOST_FOREACH()` would also work.
+			for (const auto &client : tree.get_child("clients"))
+			{
+				std::string name;
+				ptree sub_pt;
+				std::tie(name, sub_pt) = client;
+
+				if (name == "client")
+				{
+					int id = 0;
+					id = sub_pt.get<int>("<xmlattr>.id");
+					CClientData cl;
+
+					cl.setId(id);
+					cl.setKey(sub_pt.get<std::string>("<xmlattr>.key"));
+					cl.setEmail(sub_pt.get<std::string>("<xmlattr>.mail"));
+
+					for (const auto &alert : client.second)
+					{
+						std::string namealert;
+						ptree sub_ptalert;
+						std::tie(namealert, sub_ptalert) = alert;
+
+						if (namealert == "<xmlattr>") continue;
+
+						CAlert al = CAlert(sub_ptalert.get<std::string>("<xmlattr>.type"), sub_ptalert.get<std::string>("<xmlattr>.limit"));
+						cl.addAlert(al.getType(), al);
+					}
+
+					m_clients[id] = cl;
+				}
+			}
+		}
+	}
+	catch (std::exception& e)
+	{
+		//BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
+		std::cerr << "Exception: " << e.what() << "\n";
+	}
 }
 
 CMachineData* CServerAppLogic::mapHttpToObject(string data)
@@ -111,7 +164,7 @@ CMachineData* CServerAppLogic::mapHttpToObject(string data)
 	}
 	catch (std::exception& e)
 	{
-		BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
+		//BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
 	}
 	
 	return new_data;
@@ -122,7 +175,7 @@ void CServerAppLogic::receivedPackage(string data)
 	try
 	{
 		// save data
-		if (data.length() > 160)
+		if (data.length() > JSON_INDEX)
 		{
 			string json_data = data.substr(JSON_INDEX, data.length() - 1);
 			m_queue.push(json_data);
@@ -130,7 +183,7 @@ void CServerAppLogic::receivedPackage(string data)
 	}
 	catch (std::exception& e)
 	{
-		BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what() << "\n";
+		//BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what() << "\n";
 	}
 }
 
@@ -165,7 +218,7 @@ void CServerAppLogic::readAndSaveData()
 	}
 	else
 	{
-		BOOST_LOG_TRIVIAL(trace) << "readAndSaveData: Queue empty";
+		//BOOST_LOG_TRIVIAL(trace) << "readAndSaveData: Queue empty";
 	}
 }
 
@@ -179,12 +232,12 @@ void CServerAppLogic::writeDatabase(CMachineData* data)
 		{
 			if (database.close() == DBConnectionStatus::DISCONNECTED)
 			{
-				BOOST_LOG_TRIVIAL(trace) << "writeDatabase: Success";
+				//BOOST_LOG_TRIVIAL(trace) << "writeDatabase: Success";
 				return;
 			}
 		}
 	}
-	BOOST_LOG_TRIVIAL(error) << "writeDatabase: Error";
+	//BOOST_LOG_TRIVIAL(error) << "writeDatabase: Error";
 }
 
 void CServerAppLogic::checkAlerts(CMachineData* data)
@@ -219,29 +272,35 @@ void CServerAppLogic::checkAlerts(CMachineData* data)
 
 bool CServerAppLogic::validateKey(CMachineData * data)
 {
+	try
+	{
+		CClientData client = m_clients[data->getId()];
+
+		if (client.getKey().compare(data->getKey()) == 0)
+			return true;
+	}
+	catch (std::exception& e)
+	{
+		//BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what() << "\n";
+	}
 	return false;
 }
 
 bool CServerAppLogic::sendEmail(CClientData client, string data)
 {
-	CEmail mailc("yoursmtpserver.com", 25, "user@yourdomain.com", "password");
+	CServerConfiguration* server_conf = Singleton<CServerConfiguration>::Instance();
+
+	CEmail mailc(server_conf->getSmtpAddress(), server_conf->getSmtpPort(), 
+		server_conf->getSmtpUserEmail(), server_conf->getSmtpUserPassword());
 	
-	if (mailc.send("from@yourdomain.com", client.getEmail(), "Alert Message", data))
+	if (mailc.send(server_conf->getSmtpUserEmail(), client.getEmail(), "Alert Message : ID = " + client.getId(), data))
 	{
-		BOOST_LOG_TRIVIAL(error) << "sendEmail: Error";
+		//BOOST_LOG_TRIVIAL(error) << "sendEmail: Error";
 		return false;
 	}
 
-	BOOST_LOG_TRIVIAL(trace) << "sendEmail: Success";
+	//BOOST_LOG_TRIVIAL(trace) << "sendEmail: Success";
 	return true;
-}
-
-void CServerAppLogic::sendPackage()
-{
-	// get response package
-
-	// send package
-
 }
 
 string CServerAppLogic::getResponseData()

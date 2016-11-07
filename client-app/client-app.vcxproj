@@ -91,6 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>c:\boost\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
+      <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions);_WIN32_WINNT=0x0501</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -108,6 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>c:\boost\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
+      <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions);_WIN32_WINNT=0x0501</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,6 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>c:\boost\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
+      <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions);_WIN32_WINNT=0x0501</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,6 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>c:\boost\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
+      <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions);_WIN32_WINNT=0x0501</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,7 +168,7 @@
     <ClCompile Include="..\common\CMachineDataWindows.cpp" />
     <ClCompile Include="CClientAppLogic.cpp" />
     <ClCompile Include="CClientConnection.cpp" />
-    <ClCompile Include="CServerConfiguration.cpp" />
+    <ClCompile Include="CClientConfiguration.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,10 +179,10 @@
     <ClInclude Include="..\common\Singleton.h" />
     <ClInclude Include="CClientAppLogic.h" />
     <ClInclude Include="CClientConnection.h" />
-    <ClInclude Include="CServerConfiguration.h" />
+    <ClInclude Include="CClientConfiguration.h" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="server_configuration.xml" />
+    <Xml Include="client-configuration.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -17,6 +17,7 @@ class CEmail
 {
 public:
 	CEmail(std::string pServer, unsigned int pPort, std::string pUser, std::string pPassword);
+	CEmail(std::string pServer, std::string pPort, std::string pUser, std::string pPassword);
 	bool send(std::string pFrom, std::string pTo, std::string pSubject, std::string pMessage);
 private:
 	std::string encodeBase64(std::string pData);

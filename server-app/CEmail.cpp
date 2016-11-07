@@ -1,5 +1,7 @@
 #define _SCL_SECURE_NO_WARNINGS
 #include "CEmail.h"
+#include <boost/lexical_cast.hpp>
+
 //SMTPClient mailc("yoursmtpserver.com", 25, "user@yourdomain.com", "password");
 //mailc.Send("from@yourdomain.com", "to@somewhere.com", "subject", "Hello from C++ SMTP Client!");
 
@@ -9,6 +11,19 @@ CEmail::CEmail(std::string pServer, unsigned int pPort, std::string pUser, std::
 	tcp::resolver::query qry(mServer, boost::lexical_cast<std::string>(mPort));
 	mResolver.async_resolve(qry, boost::bind(&CEmail::handleResolve, this, boost::asio::placeholders::error,
 		boost::asio::placeholders::iterator));
+}
+
+CEmail::CEmail(std::string pServer, std::string pPort, std::string pUser, std::string pPassword)
+	: mServer(pServer), mUserName(pUser), mPassword(pPassword), mSocket(mIOService), mResolver(mIOService)
+{
+	try
+	{
+		mPort = boost::lexical_cast<unsigned int>(pPort);
+	}
+	catch (boost::bad_lexical_cast const&)
+	{
+		mPort = 25;
+	}
 }
 
 bool CEmail::send(std::string pFrom, std::string pTo, std::string pSubject, std::string pMessage)

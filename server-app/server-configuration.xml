@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <address>localhost</address>
+  <port>9999</port>
+  <smtp>
+    <server>smtp.gmail.com</server>
+    <port>587</port>
+    <user>rfribeiro.crossover@gmail.com</user>
+    <password>!1qaz@2wsx</password>
+  </smtp>
+</configuration>

@@ -23,7 +23,7 @@ void CMachineDataWindows::updateProcessInfo()
 	}
 
 	// Calculate how many process identifiers.
-	m_process = cbNeeded / sizeof(DWORD);
+	m_process = (double)cbNeeded / sizeof(DWORD);
 }
 
 void CMachineDataWindows::updateMemoryInfo()
@@ -61,5 +61,5 @@ void CMachineDataWindows::updateCpuUsageInfo()
 {
 	FILETIME idleTime, kernelTime, userTime;
 	m_cpu = GetSystemTimes(&idleTime, &kernelTime, &userTime) ? CalculateCPULoad(FileTimeToInt64(idleTime), FileTimeToInt64(kernelTime) + FileTimeToInt64(userTime)) : -1.0f;
-	m_cpu *= 100;
+	m_cpu = m_cpu * 100;
 }
