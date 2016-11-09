@@ -1,6 +1,6 @@
 #pragma once
-#include "Singleton.h"
-#include "CMachineDataWindows.h"
+#include <Singleton.h>
+#include <CMachineDataWindows.h>
 
 #ifdef _WIN32
 class CMachineData : public CMachineDataWindows

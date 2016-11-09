@@ -15,6 +15,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/scoped_thread.hpp>
 
+#include <CLogger.h>
 
 using boost::property_tree::ptree;
 using boost::property_tree::read_json;
@@ -43,10 +44,9 @@ CServerAppLogic::~CServerAppLogic()
 
 void CServerAppLogic::processData()
 {
+	LOG_INFO << "processData thread started";
 	while (true)
 	{
-		//BOOST_LOG_TRIVIAL(trace) << "processData thread started!";
-
 		Singleton<CServerAppLogic>::Instance()->readAndSaveData();
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -55,10 +55,10 @@ void CServerAppLogic::processData()
 
 void CServerAppLogic::processRequests()
 {
+	LOG_INFO << "processRequests thread started";
+
 	while (true)
 	{
-		//BOOST_LOG_TRIVIAL(trace) << "processRequests thread started!";
-
 		//start server receive data
 		boost::asio::io_service io_service;
 		CServerConnection s(io_service, Singleton<CServerConfiguration>::Instance()->getServerPort());
@@ -83,7 +83,7 @@ void CServerAppLogic::run()
 	}
 	catch (std::exception& e)
 	{
-		std::cerr << "Exception: " << e.what() << "\n";
+		LOG_ERROR << e.what();
 	}
 }
 
@@ -91,7 +91,6 @@ void CServerAppLogic::loadClientConfigurations()
 {
 	try
 	{
-		//BOOST_LOG_TRIVIAL(trace) << "loadClientConfigurations";
 		std::string filename(CLIENTS_CONF_FILENAME);
 
 		// Create empty property tree object
@@ -102,6 +101,7 @@ void CServerAppLogic::loadClientConfigurations()
 
 		if (!tree.empty())
 		{
+			int client_ids = 0;
 			// Use `get_child` to find the node containing the books and
 			// iterate over its children.
 			// `BOOST_FOREACH()` would also work.
@@ -113,11 +113,11 @@ void CServerAppLogic::loadClientConfigurations()
 
 				if (name == "client")
 				{
-					int id = 0;
-					id = sub_pt.get<int>("<xmlattr>.id");
+					//int id = 0;
+					//id = sub_pt.get<int>("<xmlattr>.id");
 					CClientData cl;
 
-					cl.setId(id);
+					//cl.setId(id);
 					cl.setKey(sub_pt.get<std::string>("<xmlattr>.key"));
 					cl.setEmail(sub_pt.get<std::string>("<xmlattr>.mail"));
 
@@ -132,16 +132,17 @@ void CServerAppLogic::loadClientConfigurations()
 						CAlert al = CAlert(sub_ptalert.get<std::string>("<xmlattr>.type"), sub_ptalert.get<std::string>("<xmlattr>.limit"));
 						cl.addAlert(al.getType(), al);
 					}
-
-					m_clients[id] = cl;
+					
+					++client_ids;
+					m_clients[client_ids] = cl;
+					m_map_clients[cl.getKey()] = client_ids;
 				}
 			}
 		}
 	}
 	catch (std::exception& e)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
-		std::cerr << "Exception: " << e.what() << "\n";
+		LOG_ERROR << e.what();
 	}
 }
 
@@ -153,18 +154,18 @@ CMachineData* CServerAppLogic::mapHttpToObject(string data)
 		std::istringstream is(data);
 		read_json(is, pt2);
 		
-		int id = pt2.get<int>(string_client_id, 0);
+		//int id = pt2.get<int>(string_client_id, 0); // not used anymore
 		std::string key = pt2.get<std::string>(string_key);
 		std::string timestamp = pt2.get<std::string>(string_timestamp);
 		double memory = pt2.get<double>(string_memory);
 		double cpu = pt2.get<double>(string_cpu);
 		double process = pt2.get<double>(string_processes);
 
-		new_data = new CMachineData(id,key, memory, cpu, process, timestamp);
+		new_data = new CMachineData(0,key, memory, cpu, process, timestamp);
 	}
 	catch (std::exception& e)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
+		LOG_ERROR << e.what();
 	}
 	
 	return new_data;
@@ -183,7 +184,7 @@ void CServerAppLogic::receivedPackage(string data)
 	}
 	catch (std::exception& e)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what() << "\n";
+		LOG_ERROR << e.what();
 	}
 }
 
@@ -216,10 +217,6 @@ void CServerAppLogic::readAndSaveData()
 		}
 		machine_data = NULL;
 	}
-	else
-	{
-		//BOOST_LOG_TRIVIAL(trace) << "readAndSaveData: Queue empty";
-	}
 }
 
 void CServerAppLogic::writeDatabase(CMachineData* data)
@@ -232,41 +229,48 @@ void CServerAppLogic::writeDatabase(CMachineData* data)
 		{
 			if (database.close() == DBConnectionStatus::DISCONNECTED)
 			{
-				//BOOST_LOG_TRIVIAL(trace) << "writeDatabase: Success";
+				LOG_INFO << "writeDatabase success";
 				return;
 			}
 		}
 	}
-	//BOOST_LOG_TRIVIAL(error) << "writeDatabase: Error";
+	LOG_ERROR << "writeDatabase error";
 }
 
 void CServerAppLogic::checkAlerts(CMachineData* data)
 {
-	CClientData client = m_clients[data->getId()];
-	std::stringstream resp;
-	bool bNeedEmail = false;
-
-	if (client.checkAlert(CAlertType::ALERT_MEMORY, data->getMemory()))
+	try
 	{
-		resp << "Memory Alert: " << data->getMemory() << " : " << (client.getAlert(CAlertType::ALERT_MEMORY)).getValue() << endl;
-		bNeedEmail = true;
+		CClientData client = m_clients[m_map_clients[data->getKey()]];
+		std::stringstream resp;
+		bool bNeedEmail = false;
+
+		if (client.checkAlert(CAlertType::ALERT_MEMORY, data->getMemory()))
+		{
+			resp << "Memory Alert: " << data->getMemory() << " : " << (client.getAlert(CAlertType::ALERT_MEMORY)).getValue() << endl;
+			bNeedEmail = true;
+		}
+
+		if (client.checkAlert(CAlertType::ALERT_CPU, data->getCpuUsage()))
+		{
+			resp << "CPU Alert: " << data->getCpuUsage() << " : " << (client.getAlert(CAlertType::ALERT_CPU)).getValue() << endl;
+			bNeedEmail = true;
+		}
+
+		if (client.checkAlert(CAlertType::ALERT_PROCESSES, data->getProcess()))
+		{
+			resp << "Processes Alert: " << data->getProcess() << " : " << (client.getAlert(CAlertType::ALERT_PROCESSES)).getValue() << endl;
+			bNeedEmail = true;
+		}
+
+		if (bNeedEmail)
+		{
+			sendEmail(client, resp.str());
+		}
 	}
-
-	if (client.checkAlert(CAlertType::ALERT_CPU, data->getCpuUsage()))
+	catch (std::exception& e)
 	{
-		resp << "CPU Alert: " << data->getCpuUsage() << " : " << (client.getAlert(CAlertType::ALERT_CPU)).getValue() << endl;
-		bNeedEmail = true;
-	}
-
-	if (client.checkAlert(CAlertType::ALERT_PROCESSES, data->getProcess()))
-	{
-		resp << "Processes Alert: " << data->getProcess() << " : " << (client.getAlert(CAlertType::ALERT_PROCESSES)).getValue() << endl;
-		bNeedEmail = true;
-	}
-
-	if (bNeedEmail)
-	{
-		sendEmail(client, resp.str());
+		LOG_ERROR << e.what();
 	}
 }
 
@@ -274,14 +278,14 @@ bool CServerAppLogic::validateKey(CMachineData * data)
 {
 	try
 	{
-		CClientData client = m_clients[data->getId()];
+		CClientData client = m_clients[m_map_clients[data->getKey()]];
 
 		if (client.getKey().compare(data->getKey()) == 0)
 			return true;
 	}
 	catch (std::exception& e)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what() << "\n";
+		LOG_ERROR << e.what();
 	}
 	return false;
 }
@@ -293,13 +297,13 @@ bool CServerAppLogic::sendEmail(CClientData client, string data)
 	CEmail mailc(server_conf->getSmtpAddress(), server_conf->getSmtpPort(), 
 		server_conf->getSmtpUserEmail(), server_conf->getSmtpUserPassword());
 	
-	if (mailc.send(server_conf->getSmtpUserEmail(), client.getEmail(), "Alert Message : ID = " + client.getId(), data))
+	if (mailc.send(server_conf->getSmtpUserEmail(), client.getEmail(), "Alert Message", data))
 	{
-		//BOOST_LOG_TRIVIAL(error) << "sendEmail: Error";
+		LOG_ERROR << "sendEmail: Error";
 		return false;
 	}
 
-	//BOOST_LOG_TRIVIAL(trace) << "sendEmail: Success";
+	LOG_ERROR << "sendEmail: Success";
 	return true;
 }
 

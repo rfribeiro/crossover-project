@@ -3,6 +3,12 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/asio.hpp>
+#include <CLogger.h>
+
+boost::asio::io_service io_service_timer;
+boost::posix_time::seconds interval(5); // 1 second
+boost::asio::deadline_timer timer_tick(io_service_timer, interval);
 
 using boost::property_tree::ptree;
 using boost::property_tree::write_json;
@@ -30,7 +36,7 @@ CClientAppLogic::~CClientAppLogic()
 const string CClientAppLogic::getData()
 {
 	ptree pt;
-	pt.put(string_client_id, machine_data->getId());
+	//pt.put(string_client_id, machine_data->getId());
 	pt.put(string_key, machine_data->getKey());
 	pt.put(string_timestamp, machine_data->getTimestamp());
 	pt.put(string_memory, std::round(machine_data->getMemory()));
@@ -42,6 +48,29 @@ const string CClientAppLogic::getData()
 	return buf.str();
 }
 
+void CClientAppLogic::tick(const boost::system::error_code&)
+{
+	try
+	{
+		CClientAppLogic* logic = Singleton<CClientAppLogic>::Instance();
+		logic->run();
+
+		//timer.expires_at(timer.expires_at() + logic->m_server_config.getTimer());
+		timer_tick.expires_at(timer_tick.expires_at() + interval);
+		timer_tick.async_wait(CClientAppLogic::tick);
+	}
+	catch (std::exception& e)
+	{
+		LOG_ERROR << "Exception: " << e.what();
+	}
+}
+
+void CClientAppLogic::init()
+{
+	timer_tick.async_wait(&CClientAppLogic::tick);
+	io_service_timer.run();
+}
+
 void CClientAppLogic::run()
 {
 	try
@@ -51,13 +80,13 @@ void CClientAppLogic::run()
 
 		// update server and key configuration data 
 		m_server_config.update();
-	
+
 		boost::asio::io_service io_service;
 		CClientConnection c(io_service, m_server_config.getIp(), m_server_config.getPort(), getData());
 		io_service.run();
 	}
 	catch (std::exception& e)
 	{
-		std::cout << "Exception: " << e.what() << "\n";
+		LOG_ERROR << "Exception: " << e.what();
 	}
 }

@@ -1,16 +1,21 @@
 #define _SCL_SECURE_NO_WARNINGS
 #include "CEmail.h"
 #include <boost/lexical_cast.hpp>
-
-//SMTPClient mailc("yoursmtpserver.com", 25, "user@yourdomain.com", "password");
-//mailc.Send("from@yourdomain.com", "to@somewhere.com", "subject", "Hello from C++ SMTP Client!");
+#include <CLogger.h>
 
 CEmail::CEmail(std::string pServer, unsigned int pPort, std::string pUser, std::string pPassword) :
 	mServer(pServer), mPort(pPort), mUserName(pUser), mPassword(pPassword), mSocket(mIOService), mResolver(mIOService)
 {
-	tcp::resolver::query qry(mServer, boost::lexical_cast<std::string>(mPort));
-	mResolver.async_resolve(qry, boost::bind(&CEmail::handleResolve, this, boost::asio::placeholders::error,
-		boost::asio::placeholders::iterator));
+	try
+	{
+		tcp::resolver::query qry(mServer, boost::lexical_cast<std::string>(mPort));
+		mResolver.async_resolve(qry, boost::bind(&CEmail::handleResolve, this, boost::asio::placeholders::error,
+			boost::asio::placeholders::iterator));
+	}
+	catch (std::exception& ex)
+	{
+		LOG_ERROR << "Init SMTP connection : " << ex.what();
+	}
 }
 
 CEmail::CEmail(std::string pServer, std::string pPort, std::string pUser, std::string pPassword)
@@ -20,9 +25,14 @@ CEmail::CEmail(std::string pServer, std::string pPort, std::string pUser, std::s
 	{
 		mPort = boost::lexical_cast<unsigned int>(pPort);
 	}
-	catch (boost::bad_lexical_cast const&)
+	catch (boost::bad_lexical_cast const& l)
 	{
 		mPort = 25;
+		LOG_ERROR << l.what();
+	}
+	catch (std::exception& ex) 
+	{
+		LOG_ERROR << ex.what();
 	}
 }
 
@@ -56,6 +66,7 @@ void CEmail::handleResolve(const boost::system::error_code& err, tcp::resolver::
 	{
 		mHasError = true;
 		mErrorMsg = err.message();
+		LOG_ERROR << mErrorMsg;
 	}
 }
 void CEmail::writeLine(std::string pData)
@@ -89,5 +100,6 @@ void CEmail::handleConnect(const boost::system::error_code& err, tcp::resolver::
 	{
 		mHasError = true;
 		mErrorMsg = err.message();
+		LOG_ERROR << mErrorMsg;
 	}
 }

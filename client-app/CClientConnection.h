@@ -5,6 +5,7 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <CLogger.h>
 
 using boost::asio::ip::tcp;
 using namespace std;
@@ -65,7 +66,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error: " << err.message() << "\n";
+			LOG_ERROR << err.message();
 		}
 	}
 
@@ -73,7 +74,7 @@ private:
 	{
 		if (!err)
 		{
-			cout << "Sent : " << endl << make_string(request_) << endl << endl;
+			LOG_INFO << "Sent : " << endl << make_string(request_) << endl << endl;
 
 			// The connection was successful. Send the request.
 			boost::asio::async_write(socket_, request_,
@@ -82,7 +83,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error: " << err.message() << "\n";
+			LOG_ERROR << err.message();
 		}
 	}
 
@@ -99,7 +100,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error: " << err.message() << "\n";
+			LOG_ERROR << err.message();
 		}
 	}
 
@@ -107,7 +108,7 @@ private:
 	{
 		if (!err)
 		{
-			cout << "Received : " << endl << make_string(response_) << endl << endl;
+			LOG_INFO << "Received : " << endl << make_string(response_) << endl << endl;
 
 			// Check that response is OK.
 			std::istream response_stream(&response_);
@@ -120,13 +121,12 @@ private:
 			std::getline(response_stream, status_message);
 			if (!response_stream || http_version.substr(0, 5) != "HTTP/")
 			{
-				std::cout << "Invalid response\n";
+				LOG_ERROR << "Invalid response\n";
 				return;
 			}
 			if (status_code != 200)
 			{
-				std::cout << "Response returned with status code ";
-				std::cout << status_code << "\n";
+				LOG_ERROR << "Response returned with status code " << status_code;
 				return;
 			}
 
@@ -138,7 +138,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error: " << err << "\n";
+			LOG_ERROR << err;
 		}
 	}
 
@@ -156,9 +156,9 @@ private:
 				{
 					content_length = atoi(header.substr(15, header.length() - 1).c_str());
 				}
-				std::cout << header << "\n";
+				//std::cout << header << "\n";
 			}
-			std::cout << "\n";
+			//std::cout << "\n";
 
 			// Write whatever content we already have to output.
 			if (response_.size() > 0)
@@ -172,7 +172,7 @@ private:
 		}
 		else
 		{
-			std::cout << "Error: " << err << "\n";
+			LOG_ERROR << err;
 		}
 	}
 
@@ -186,7 +186,7 @@ private:
 		}
 		else if (err != boost::asio::error::eof)
 		{
-			std::cout << "Error: " << err << "\n";
+			LOG_ERROR << err;
 		}
 	}
 

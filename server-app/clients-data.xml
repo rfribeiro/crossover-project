@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <clients>
-  <client id="1" key ="xxxx" mail="rafaelfernandoribeiro@hotmail.com">
+  <client key ="xxxx" mail="rafaelfernandoribeiro@hotmail.com">
     <alert type="memory" limit="50%"/>
     <alert type="cpu" limit="50%"/>
     <alert type="processes" limit="50"/>
   </client>
-  <client id="2" key ="yyyy" mail="rfribeiro@gmail.com">
+  <client key ="yyyy" mail="rfribeiro@gmail.com">
     <alert type="memory" limit="50%"/>
     <alert type="cpu" limit="20%"/>
     <alert type="processes" limit="50"/>
   </client>
-  <client id="3" key ="zzzz" mail="rfribeiro@gmail.com">
+  <client key ="zzzz" mail="rfribeiro@gmail.com">
     <alert type="memory" limit="90%"/>
     <alert type="cpu" limit="90%"/>
     <alert type="processes" limit="200"/>

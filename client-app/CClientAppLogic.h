@@ -1,6 +1,7 @@
 #include <iostream>
-#include "../common/Singleton.h"
-#include "../common/CMachineData.h"
+#include <boost/asio.hpp>
+#include <Singleton.h>
+#include <CMachineData.h>
 #include "CClientConfiguration.h"
 
 using namespace std;
@@ -11,6 +12,8 @@ public:
 	CClientAppLogic();
 	~CClientAppLogic();
 	void run();
+	void init();
+	static void tick(const boost::system::error_code&);
 private:
 	const string getData();
 	CMachineData* machine_data;

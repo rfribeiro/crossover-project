@@ -1,5 +1,6 @@
 #pragma once
-#include "CMachineDataInterface.h"
+#include <CMachineDataInterface.h>
+
 class CMachineDataLinux :
 	public CMachineDataInterface
 {

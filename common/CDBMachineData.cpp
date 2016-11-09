@@ -1,12 +1,14 @@
 #include "CDBMachineData.h"
 #include <iostream>
 #include "../common/sqlite3pp.h"
+#include <CLogger.h>
 
 using namespace std;
 
 enum DBIndex
 {
-	ID = 1,
+	//ID = 1,
+	KEY = 1,
 	TIMESTAMP,
 	MEMORY,
 	CPU,
@@ -26,16 +28,17 @@ CDBMachineData::~CDBMachineData()
 
 DBConnectionStatus CDBMachineData::open()
 {
-	try {
-			sqlite3pp::database db("./test.db");
+	try 
+	{
+		sqlite3pp::database db("./test.db");
 
-			sqlite3pp::command cmd(db, "CREATE TABLE IF NOT EXISTS machine_data(id INTEGER, timestamp TEXT, memory REAL, cpu REAL, processes REAL)");
-			cout << cmd.execute() << endl;
-		}
-		catch (std::exception& ex) {
-			cout << ex.what() << endl;
-			DBConnectionStatus::DISCONNECTED;
-		}
+		sqlite3pp::command cmd(db, "CREATE TABLE IF NOT EXISTS machine_data(key TEXT, timestamp TEXT, memory REAL, cpu REAL, processes REAL, PRIMARY KEY (key, timestamp))");
+		cmd.execute();
+	}
+	catch (std::exception& ex) {
+		LOG_ERROR << ex.what();
+		return DBConnectionStatus::DISCONNECTED;
+	}
 
 	return DBConnectionStatus::CONNECTED;
 }
@@ -54,21 +57,22 @@ DBDataStatus CDBMachineData::write(CMachineData* data)
 
 			sqlite3pp::transaction xct(db);
 
-			sqlite3pp::command cmd(db, "INSERT INTO machine_data (id, timestamp, memory, cpu, processes) VALUES (?, ?, ?, ?, ?)");
+			sqlite3pp::command cmd(db, "INSERT INTO machine_data (key, timestamp, memory, cpu, processes) VALUES (?, ?, ?, ?, ?)");
 
-			cout << cmd.bind(DBIndex::ID, std::to_string(data->getId()), sqlite3pp::copy) << endl;
-			cout << cmd.bind(DBIndex::TIMESTAMP, data->getTimestamp(), sqlite3pp::copy) << endl;
-			cout << cmd.bind(DBIndex::MEMORY, std::to_string(data->getMemory()), sqlite3pp::copy) << endl;
-			cout << cmd.bind(DBIndex::CPU, std::to_string(data->getCpuUsage()), sqlite3pp::copy) << endl;
-			cout << cmd.bind(DBIndex::PROCESSES, std::to_string(data->getProcess()), sqlite3pp::copy) << endl;
+			//cmd.bind(DBIndex::ID, std::to_string(data->getId()), sqlite3pp::copy);
+			cmd.bind(DBIndex::KEY, data->getKey(), sqlite3pp::copy);
+			cmd.bind(DBIndex::TIMESTAMP, data->getTimestamp(), sqlite3pp::copy);
+			cmd.bind(DBIndex::MEMORY, std::to_string(data->getMemory()), sqlite3pp::copy);
+			cmd.bind(DBIndex::CPU, std::to_string(data->getCpuUsage()), sqlite3pp::copy);
+			cmd.bind(DBIndex::PROCESSES, std::to_string(data->getProcess()), sqlite3pp::copy);
 
-			cout << cmd.execute() << endl;
+			cmd.execute();
 
 			xct.commit();
 		}
 	}
 	catch (std::exception& ex) {
-		cout << ex.what() << endl;
+		LOG_ERROR << ex.what();
 		return DBDataStatus::WRITE_NOK;
 	}
 

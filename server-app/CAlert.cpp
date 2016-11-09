@@ -1,5 +1,6 @@
 #include "CAlert.h"
 #include <boost/lexical_cast.hpp>
+#include <CLogger.h>
 
 CAlert::CAlert()
 {
@@ -24,14 +25,14 @@ CAlert::CAlert(CAlertType type, string value)
 		}
 		m_value = boost::lexical_cast<double>(value);
 	}
-	catch (boost::bad_lexical_cast const&)
+	catch (boost::bad_lexical_cast const& l)
 	{
 		m_value = 0;
+		LOG_ERROR << l.what();
 	}
 	catch (std::exception& e)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
-		std::cerr << "Exception: " << e.what() << "\n";
+		LOG_ERROR << e.what();
 	}
 }
 
@@ -45,6 +46,8 @@ CAlert::CAlert(string type, string value)
 			m_type = CAlertType::ALERT_CPU;
 		else if (type == "processes")
 			m_type = CAlertType::ALERT_PROCESSES;
+		else
+			LOG_ERROR << "Alert type not valid";
 
 		if (value[value.length() - 1] == '%')
 		{
@@ -52,14 +55,14 @@ CAlert::CAlert(string type, string value)
 		}
 		m_value = boost::lexical_cast<double>(value);
 	}
-	catch (boost::bad_lexical_cast const&)
+	catch (boost::bad_lexical_cast const& l)
 	{
 		m_value = 0;
+		LOG_ERROR << l.what();
 	}
 	catch (std::exception& e)
 	{
-		//BOOST_LOG_TRIVIAL(error) << "mapHttpToObject Exception: " << e.what() << "\n";
-		std::cerr << "Exception: " << e.what() << "\n";
+		LOG_ERROR << e.what();
 	}
 }
 

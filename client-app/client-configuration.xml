@@ -3,6 +3,5 @@
   <address>localhost</address>
   <port>9999</port>
   <key>zzzz</key>
-  <id>3</id>
   <timer>5</timer>
 </configuration>

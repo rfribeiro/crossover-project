@@ -1,7 +1,7 @@
 #include "CClientConfiguration.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-
+#include <CLogger.h>
 
 CClientConfiguration::CClientConfiguration()
 {
@@ -54,11 +54,11 @@ void CClientConfiguration::read()
 		m_ip = pt.get<std::string>("configuration.address");
 		m_port = pt.get<std::string>("configuration.port");
 		m_key = pt.get<std::string>("configuration.key");
-		m_client_id = pt.get<int>("configuration.id");
+		//m_client_id = pt.get<int>("configuration.id");
 		m_timer = pt.get<int>("configuration.timer");
 	}
 	catch (exception e)
 	{
-		// log
+		LOG_ERROR << "Reading client configuration file " << endl << e.what();
 	}
 }

@@ -3,6 +3,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+#include <CLogger.h>
+
 CServerConfiguration::CServerConfiguration()
 {
 	loadData();
@@ -59,6 +61,6 @@ void CServerConfiguration::loadData()
 	}
 	catch (exception e)
 	{
-		// log
+		LOG_ERROR << e.what();
 	}
 }

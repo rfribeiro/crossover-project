@@ -1,5 +1,5 @@
 #pragma once
-#include "CMachineDataInterface.h"
+#include <CMachineDataInterface.h>
 
 class CMachineDataWindows : public CMachineDataInterface
 {

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <psapi.h>
+#include <CLogger.h>
 
 CMachineDataWindows::CMachineDataWindows()
 {
@@ -14,27 +15,41 @@ CMachineDataWindows::~CMachineDataWindows()
 
 void CMachineDataWindows::updateProcessInfo()
 {
-	DWORD aProcesses[1024], cbNeeded;
-
-	if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
+	try
 	{
-		// if some error set number of process to -1
-		m_process = -1;
-	}
+		DWORD aProcesses[1024], cbNeeded;
 
-	// Calculate how many process identifiers.
-	m_process = (double)cbNeeded / sizeof(DWORD);
+		if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
+		{
+			// if some error set number of process to -1
+			m_process = -1;
+		}
+
+		// Calculate how many process identifiers.
+		m_process = (double)cbNeeded / sizeof(DWORD);
+	}
+	catch (exception e)
+	{
+		LOG_ERROR << "Reading updateProcessInfo " << endl << e.what();
+	}
 }
 
 void CMachineDataWindows::updateMemoryInfo()
 {
-	MEMORYSTATUSEX statex;
+	try
+	{
+		MEMORYSTATUSEX statex;
 
-	statex.dwLength = sizeof(statex);
+		statex.dwLength = sizeof(statex);
 
-	GlobalMemoryStatusEx(&statex);
+		GlobalMemoryStatusEx(&statex);
 
-	m_memory = statex.dwMemoryLoad;
+		m_memory = statex.dwMemoryLoad;
+	}
+	catch (exception e)
+	{
+		LOG_ERROR << "Reading updateMemoryInfo " << endl << e.what();
+	}
 }
 
 float CMachineDataWindows::CalculateCPULoad(unsigned long long idleTicks, unsigned long long totalTicks)
@@ -59,7 +74,14 @@ static unsigned long long FileTimeToInt64(const FILETIME & ft) { return (((unsig
 // the previous call and the current one.  Returns -1.0 on error.
 void CMachineDataWindows::updateCpuUsageInfo()
 {
-	FILETIME idleTime, kernelTime, userTime;
-	m_cpu = GetSystemTimes(&idleTime, &kernelTime, &userTime) ? CalculateCPULoad(FileTimeToInt64(idleTime), FileTimeToInt64(kernelTime) + FileTimeToInt64(userTime)) : -1.0f;
-	m_cpu = m_cpu * 100;
+	try
+	{
+		FILETIME idleTime, kernelTime, userTime;
+		m_cpu = GetSystemTimes(&idleTime, &kernelTime, &userTime) ? CalculateCPULoad(FileTimeToInt64(idleTime), FileTimeToInt64(kernelTime) + FileTimeToInt64(userTime)) : -1.0f;
+		m_cpu = m_cpu * 100;
+	}
+	catch (exception e)
+	{
+		LOG_ERROR << "Reading updateCpuUsageInfo " << endl << e.what();
+	}
 }

@@ -2,6 +2,8 @@
 #include "../common/Singleton.h"
 #include "CServerAppLogic.h"
 
+#include <CLogger.h>
+
 tcp::socket& session::socket()
 {
 	return socket_;
@@ -28,7 +30,7 @@ void session::handle_read(const boost::system::error_code& error,
 {
 	if (!error)
 	{
-		cout << "Received: " << endl << data_ << endl << endl;
+		LOG_INFO << "Received: " << endl << data_ << endl << endl;
 
 		CServerAppLogic* logic = Singleton<CServerAppLogic>::Instance();
 		logic->receivedPackage(data_);
@@ -55,7 +57,7 @@ void session::handle_write(const boost::system::error_code& error)
 {
 	if (!error)
 	{
-		cout << "Sent: " << endl << data_ << endl << endl;
+		LOG_INFO << "Sent: " << endl << data_ << endl << endl;
 
 		socket_.async_read_some(boost::asio::buffer(data_, max_length),
 			boost::bind(&session::handle_read, this,
